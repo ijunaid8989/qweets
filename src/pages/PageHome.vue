@@ -37,8 +37,11 @@
       color="grey-2"
     />
 
-    <q-list>
-      <q-item class="q-py-md">
+    <q-list separator>
+      <q-item
+        v-for="qweet in qweets"
+        :key="qweet.date"
+        class="q-py-md">
         <q-item-section avatar top>
           <q-avatar size="xl">
             <img src="https://cdn.quasar.dev/logo-v2/svg/logo.svg">
@@ -52,10 +55,7 @@
               @junaid_farooq
             </span>
           </q-item-label>
-          <q-item-label class="qweet-content text-body1">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-
-            Aliquam voluptatem voluptatibus sit sunt, iusto repellendus voluptate amet eos numquam nam excepturi ab fuga delectus minima molestias. Ex nobis corporis suscipit!
-          </q-item-label>
+          <q-item-label class="qweet-content text-body1">{{ qweet.content }}</q-item-label>
           <div class="qweet-icons row justify-between q-mt-sm">
             <q-btn
               color="grey"
@@ -89,7 +89,7 @@
         </q-item-section>
 
         <q-item-section side top>
-          1 min ago
+          {{ qweet.date | relativeDate }}
         </q-item-section>
       </q-item>
     </q-list>
@@ -97,11 +97,28 @@
 </template>
 
 <script>
+import { formatDistance } from "date-fns"
+
 export default {
   name: 'PageHome',
   data() {
     return {
-      newQweetContent: ''
+      newQweetContent: '',
+      qweets: [
+        {
+          content: "Aliquam voluptatem voluptatibus sit sunt, iusto repellendus voluptate amet eos numquam nam excepturi ab fuga delectus minima molestias. Ex nobis corporis suscipit!",
+          date: 1622920196275
+        },
+        {
+          content: "Aliquam voluptatem voluptatibus sit sunt, iusto repellendus voluptate amet eos numquam nam excepturi ab fuga delectus minima molestias. Ex nobis corporis suscipit!",
+          date: 1622920210394
+        }
+      ]
+    }
+  },
+  filters: {
+    relativeDate(value) {
+      return formatDistance(value, new Date())
     }
   }
 }
