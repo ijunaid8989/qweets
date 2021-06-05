@@ -20,6 +20,7 @@
       </div>
       <div class="col col-shrink">
         <q-btn
+          @click="addNewQweet"
           :disabled="!newQweetContent"
           class="q-mb-lg"
           color="primary"
@@ -114,6 +115,16 @@ export default {
           date: 1622920210394
         }
       ]
+    }
+  },
+  methods: {
+    addNewQweet() {
+      console.log("AddedNewQweet")
+      let newQweet = {
+        content: this.newQweetContent,
+        date: Date.now()
+      }
+      this.qweets.unshift(newQweet)
     }
   },
   filters: {
