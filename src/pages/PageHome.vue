@@ -104,6 +104,7 @@
 </template>
 
 <script>
+import db from "src/boot/firebase"
 import { formatDistance } from "date-fns"
 
 export default {
@@ -111,16 +112,7 @@ export default {
   data() {
     return {
       newQweetContent: '',
-      qweets: [
-        {
-          content: "Aliquam voluptatem voluptatibus sit sunt, iusto repellendus voluptate amet eos numquam nam excepturi ab fuga delectus minima molestias. Ex nobis corporis suscipit!",
-          date: 1622920196275
-        },
-        {
-          content: "Aliquam voluptatem voluptatibus sit sunt, iusto repellendus voluptate amet eos numquam nam excepturi ab fuga delectus minima molestias. Ex nobis corporis suscipit!",
-          date: 1622920210394
-        }
-      ]
+      qweets: []
     }
   },
   methods: {
@@ -130,7 +122,12 @@ export default {
         content: this.newQweetContent,
         date: Date.now()
       }
-      this.qweets.unshift(newQweet)
+      db.collection("qweets").add(newQweet).then((docRef) => {
+        console.log("Document written with ID: ", docRef.id)
+      })
+      .catch((error) => {
+        console.error("Error adding document: ", error)
+      })
       this.newQweetContent = ''
     },
     deleteQweet(qweet) {
@@ -143,6 +140,20 @@ export default {
     relativeDate(value) {
       return formatDistance(value, new Date())
     }
+  },
+  mounted() {
+    db.collection("qweets").onSnapshot((snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        let qweetChange = change.doc.data()
+        if (change.type === "added") {
+          this.qweets.unshift(qweetChange)
+        }
+        if (change.type === "modified") {
+        }
+        if (change.type === "removed") {
+        }
+      })
+    })
   }
 }
 </script>
