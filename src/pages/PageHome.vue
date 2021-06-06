@@ -1,6 +1,6 @@
 <template>
   <q-page class="relative-position">
-    <q-scroll-area class="absolute fullscreen">
+    <q-scroll-area class="absolute full-width full-height">
       <div class="q-py-lg q-px-md row items-end q-col-gutter-md">
         <div class="col">
           <q-input
@@ -80,8 +80,9 @@
                   round
                 />
                 <q-btn
-                  color="grey"
-                  icon="far fa-heart"
+                  @click="toggleLiked(qweet)"
+                  :color="qweet.liked ? 'pink' : 'grey'"
+                  :icon="qweet.liked ? 'fas fa-heart' : 'far fa-heart'"
                   size="sm"
                   flat
                   round
@@ -120,7 +121,8 @@ export default {
       console.log("AddedNewQweet")
       let newQweet = {
         content: this.newQweetContent,
-        date: Date.now()
+        date: Date.now(),
+        liked: false
       }
       db.collection("qweets").add(newQweet).then((docRef) => {
         console.log("Document written with ID: ", docRef.id)
@@ -136,6 +138,20 @@ export default {
       }).catch((error) => {
           console.error("Error removing document: ", error)
       })
+    },
+    toggleLiked(qweet) {
+      let qweetRef = db.collection("qweets").doc(qweet.id);
+
+      // Set the "capital" field of the city 'DC'
+      return qweetRef.update({
+        liked: !qweet.liked
+      })
+      .then(() => {
+          console.log("Document successfully updated!");
+      })
+      .catch((error) => {
+          console.error("Error updating document: ", error);
+      })
     }
   },
   filters: {
@@ -147,11 +163,14 @@ export default {
     db.collection("qweets").onSnapshot((snapshot) => {
       snapshot.docChanges().forEach((change) => {
         let qweetChange = change.doc.data()
+        console.log(qweetChange)
         qweetChange.id = change.doc.id
         if (change.type === "added") {
           this.qweets.unshift(qweetChange)
         }
         if (change.type === "modified") {
+          let index = this.qweets.findIndex(qweet => qweet.id === qweetChange.id)
+          Object.assign(this.qweets[index], qweetChange)
         }
         if (change.type === "removed") {
           let index = this.qweets.findIndex(qweet => qweet.id === qweetChange.id)
